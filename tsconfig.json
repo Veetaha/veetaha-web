@@ -7,7 +7,8 @@
     "target": "esnext",
     "module": "commonjs",
     "typeRoots": [
-      "declarations", "node_modules/@types"
+      "declarations",
+      "node_modules/@types"
     ],
     "sourceMap":      true,
     "declaration":    true, /* Generates corresponding '.d.ts' file. */
@@ -24,9 +25,9 @@
     "moduleResolution": "node"
 //    "skipLibCheck": true
   },
-  "files": ["app.ts"],
+  "files": ["veetaha.ts"],
   "include": [
     "./**/*"
   ],
-  "exclude": ["node_modules/**/*"]
+  "exclude": ["node_modules/**/*", "build"]
 }

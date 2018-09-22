@@ -1,9 +1,9 @@
 {
   "name": "veetaha-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "General purpose typescript NodeJS library.",
   "main": "build/veetaha.js",
-  "types": "build/veetaha.d.ts",
+  "types": "build/src",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
