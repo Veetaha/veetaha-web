@@ -1,3 +1,6 @@
 import * as Debug from './src/debug';
-export { Debug };
+import * as Strings from './src/strings';
+import * as Fs from './src/filesystem';
+
+export { Debug, Strings, Fs };
 export * from './src/general';

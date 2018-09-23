@@ -1,6 +1,5 @@
 export let enabled : boolean = true;
 
-
 export function assertNeverType(suspect: never) {
     if (!enabled) return;
 

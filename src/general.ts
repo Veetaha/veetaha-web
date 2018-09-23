@@ -2,6 +2,11 @@ export interface ObjectAsMap<T = unknown> {
     [key: string] : T;
 }
 
+export interface Callback<TErr, TData0 extends any[]> {
+    (err: null, ...data: TData0): void;
+    (err: TErr, data: null): void;
+}
+
 export function isObjectAsMap<T = unknown>(suspect: unknown) : suspect is ObjectAsMap<T> {
     return Boolean(
         suspect && (typeof suspect === 'object' || typeof suspect === 'function')
