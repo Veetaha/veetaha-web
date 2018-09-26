@@ -1,6 +1,6 @@
 import * as Fs from 'fs';
 import * as Strings from './strings';
-import { Callback } from './general';
+import { Callback } from './types';
 import {promisify} from "util";
 
 namespace Dirent {

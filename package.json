@@ -5,11 +5,21 @@
   "main": "build/veetaha.js",
   "types": "build/veetaha.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha build/test"
   },
   "author": "Vitaliy Kryvenko",
   "license": "MIT",
+  "dependencies": {
+    "fs-extra": "*",
+    "mocha": "*",
+    "chai": "*",
+    "ts-node": "*"
+  },
   "devDependencies": {
-    "@types/node": "*"
+    "@types/chai": "*",
+    "@types/fs-extra": "*",
+    "@types/mocha": "*",
+    "@types/node": "*",
+    "typescript": "^3.0.3"
   }
 }
