@@ -1,5 +1,12 @@
 export let enabled : boolean = true;
 
+export function assert(truthy: any) {
+    if (enabled && !truthy) {
+        console.error(`Assertion failure: ${truthy}`);
+        process.abort();
+    }
+}
+
 export function assertNeverType(suspect: never) {
     if (!enabled) return;
 
