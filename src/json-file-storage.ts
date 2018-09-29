@@ -4,30 +4,37 @@ interface JsonFileStorageTD<T extends Types.Identifiable> {
     nextId: number;
     items: T[];
 }
-
+export type JsonReviver = (key: string, value: unknown) => unknown;
 /**
  * Represents a JSON file, that contains a server object for storing Types.Identifiable objects.
  * @param T  Typescript type that must implement Types.Identifiable
  *           (i.e. contain {id: number} property). Objects of this type are stored in a JSON file.
  */
 export class JsonFileStorage<T extends Types.Identifiable> {
+    private             nextId = 1;
+    public    valueJsonReviver: JsonReviver | undefined;
+    private readonly  filePath: string;
+    private readonly storageTD: Types.TypeDescription;
+//------------------------------------------------------------
     /**
      * Reads file and interprets its content as a JSON object. Checks that it conforms to
      * the given type description (TD).
-     * @type  T         Typescript type return value is treated as, if this function didn't throw.
-     * @param filePath  String with the json target file path.
-     * @param typeDescr Type description to check resulting JSON value it must conform to.
+     * @type  T           Typescript type return value is treated as, if this function didn't throw.
+     * @param filePath    String with the json target file path.
+     * @param typeDescr   Type description to check resulting JSON value it must conform to.
+     * @param jsonReviver Function forwarded as a reviver argument to JSON.parse().
      *
      * @throws Error If actual JSON value doesn't conform to the given TD,
      *               if failed to read required file,
      *               if failed to parse resulting JSON string.
      */
-    public static async readFromJsonFile<T>(
+    static async readFromJsonFile<T>(
         filePath: string,
-        typeDescr: Types.TypeDescription
+        typeDescr: Types.TypeDescription,
+        jsonReviver?: JsonReviver
     ): Promise<T> {
         const jsonString = (await Fsextra.readFile(filePath)).toString();  // throws
-        const jsonObj = JSON.parse(jsonString);
+        const jsonObj = JSON.parse(jsonString, jsonReviver);
         if (Types.conforms<T>(jsonObj, typeDescr)) {
             return jsonObj;
         }
@@ -36,25 +43,23 @@ export class JsonFileStorage<T extends Types.Identifiable> {
         );
     }
 
-    private nextId = 1;
-    private readonly filePath: string;
-    private readonly storageTD: Types.TypeDescription;
 
     /**
      * Creates new instance of JsonFileStorage, but doesn't initialize the file at physical disk.
-     * @param itemsTD Type description the resulting JSON value must conform to. (takes ownership)
-     * @param filePath  String with the JSON target file path.
-     *
+     * @param itemsTD     Type description the resulting JSON value must conform to. (takes ownership)
+     * @param filePath    String with the JSON target file path.
+     * @param jsonReviver Function invoked to revive stored objects when using JSON.parse()
      * @throws Error If actual JSON value doesn't conform to the given TD,
      *               if failed to read required file,
      *               if failed to parse resulting JSON string.
      */
-    constructor(itemsTD: Types.TypeDescription, filePath: string) {
+    constructor(itemsTD: Types.TypeDescription, filePath: string, jsonReviver?: JsonReviver) {
         this.storageTD = {
             nextId: 'number',
             items: [itemsTD]
         };
         this.filePath = filePath;
+        this.valueJsonReviver = jsonReviver;
     }
 
     /**
@@ -68,7 +73,7 @@ export class JsonFileStorage<T extends Types.Identifiable> {
     async initialize() {
         try {
             this.nextId = (await JsonFileStorage.readFromJsonFile<JsonFileStorageTD<T>>(
-                this.filePath, this.storageTD
+                this.filePath, this.storageTD, this.valueJsonReviver
             )).nextId;
         } catch (_error) {
             this.nextId = 1;
@@ -85,7 +90,7 @@ export class JsonFileStorage<T extends Types.Identifiable> {
     }
     async getAll() {
         return (await JsonFileStorage.readFromJsonFile<JsonFileStorageTD<T>>(
-            this.filePath, this.storageTD
+            this.filePath, this.storageTD, this.valueJsonReviver
         )).items;
     }
 
@@ -108,6 +113,9 @@ export class JsonFileStorage<T extends Types.Identifiable> {
         await this.writeChangesToFile(entityArr);
     }
 
+
+
+// DETAILS------------------------------------------------------------------------------------
     private tryFindEntityIndexById(entityArr: T[], id: number) {
         const targetIndex = entityArr.findIndex(entity => entity.id === id);
         if (targetIndex < 0) {
