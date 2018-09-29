@@ -11,7 +11,8 @@ describe('Types.conforms', () => {
         assert.isTrue(Types.conforms(false, 'boolean'));
         assert.isTrue(Types.conforms(null, 'object'));
         assert.isTrue(Types.conforms(undefined, 'undefined'));
-        assert.isTrue(Types.conforms(() => {}, 'function'));
+        assert.isTrue(Types.conforms(() => {
+        }, 'function'));
         assert.isTrue(Types.conforms({prop: null}, 'object'));
         assert.isTrue(Types.conforms(Symbol(), 'symbol'));
     });
@@ -36,10 +37,10 @@ describe('Types.conforms', () => {
             }));
     });
     it('should recognize one-item TD array as a random length array', () => {
-       assert.isTrue(Types.conforms(
-           [{id: 22}, {id: 75}, {id: 55}],
-           [{id: 'number'}]
-       ));
+        assert.isTrue(Types.conforms(
+            [{id: 22}, {id: 75}, {id: 55}],
+            [{id: 'number'}]
+        ));
         assert.isTrue(Types.conforms(
             [],
             [{id: 'number'}]
@@ -64,32 +65,40 @@ describe('Types.conforms', () => {
         assert.isFalse(Types.conforms([], {}));
     });
     it('should try to match each TD in a Set', () => {
-       assert.isTrue(Types.conforms(
-       // tslint:disable-next-line no-magic-numbers
+        assert.isTrue(Types.conforms(
+            // tslint:disable-next-line no-magic-numbers
             42, new Set<Types.TypeDescription>(
-                [{obj:'number'}, 'string', 'number', ['boolean']]
-           )
-       ));
-       assert.isFalse(Types.conforms(
-           {}, new Set<Types.TypeDescription>(
-               [{obj:'number'}, 'string', 'number', ['boolean']]
-           )
-       ));
+                [{obj: 'number'}, 'string', 'number', ['boolean']]
+            )
+        ));
+        assert.isFalse(Types.conforms(
+            {}, new Set<Types.TypeDescription>(
+                [{obj: 'number'}, 'string', 'number', ['boolean']]
+            )
+        ));
 
     });
     it('should use given predicate to validate the suspect', () => {
         // tslint:disable-next-line no-magic-numbers
-       assert.isTrue(Types.conforms(23, suspect => suspect === 23));
-       assert.isTrue(Types.conforms('str', suspect => suspect === 'str'));
-       assert.isTrue(Types.conforms({
-           prop: 'Ruslan',
-           enum: 43
-       },{
-           prop: 'string',
-           // tslint:disable-next-line no-magic-numbers
-           enum: suspect => typeof suspect === 'number' && [58, 4, 43].includes(suspect)
-       }));
-       assert.isFalse(Types.conforms(true, () => false));
-    });
+        assert.isTrue(Types.conforms(23, suspect => suspect === 23));
+        assert.isTrue(Types.conforms('str', suspect => suspect === 'str'));
+        assert.isTrue(Types.conforms({
+            prop: 'Ruslan',
+            enum: 43
+        }, {
+            prop: 'string',
+            // tslint:disable-next-line no-magic-numbers
+            enum: suspect => typeof suspect === 'number' && [58, 4, 43].includes(suspect)
+        }));
+        assert.isFalse(Types.conforms(true, () => false));
+        assert.isFalse(Types.conforms({}, {
+            id: 'number',
+            login: 'string',
+            fullname: 'string',
+            registeredAt: _suspect => true,
+            avaUrl: 'string',
+            isDisabled: 'boolean',
+        }));
 
+    });
 });
