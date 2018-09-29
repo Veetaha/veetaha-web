@@ -1,12 +1,12 @@
 {
   "name": "veetaha-web",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "General purpose typescript NodeJS library.",
   "main": "build/veetaha.js",
   "types": "build/veetaha.d.ts",
   "repository": "https://github.com/Veetaha/veetaha-web",
   "scripts": {
-    "test": "mocha build/test"
+    "test": "tsc; mocha build/test"
   },
   "author": "Vitaliy Kryvenko",
   "license": "MIT",

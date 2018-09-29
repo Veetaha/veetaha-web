@@ -15,7 +15,7 @@ export type BasicType = number    | string      | boolean  |
 export type BasicTypeName = 'number'    | 'string' | 'boolean'  |
                             'undefined' | 'object' | 'function' | 'symbol';
 
-export function isBasicObject<T = unknown>(suspect: unknown) : suspect is BasicObject<T> {
+export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown> {
     return Boolean(
         suspect && (typeof suspect === 'object' || typeof suspect === 'function')
     );
@@ -36,8 +36,9 @@ export interface TypeDescrArray  extends Array<TypeDescription>
 {}
 export interface TypeDescrSet    extends Set<TypeDescription>
 {}
-
-export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypeDescrSet | BasicTypeName;
+export type TypePredicate = (suspect: unknown) => boolean;
+export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
+                                 TypeDescrSet | BasicTypeName;
 
 /**
  * Determines whether the specified suspect type satisfies the restriction of the given type
@@ -64,13 +65,18 @@ export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypeDescrSet | 
  *                  each typeDescr[key] is a TD for suspect[key]. (Excess properties in suspect
  *                  do not matter).
  *
+ *                  Else if it is a TypePredicate, then returns typeDescr(suspect).
+ *
  *                  Else returns false.
  */
 export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescription)
     : suspect is T {
     //
-    if (typeof typeDescr === 'string'){
+    if (typeof typeDescr === 'string') {
         return typeof suspect === typeDescr;
+    }
+    if (typeof typeDescr === 'function'){
+        return (typeDescr as TypePredicate)(suspect);
     }
     if (Array.isArray(typeDescr)) {
         if (!Array.isArray(suspect)) {
@@ -85,12 +91,7 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
         if (typeDescr.length !== suspect.length){
             return false;
         }
-        for (let i = 0; i < suspect.length; ++i){
-            if (!conforms(suspect[i], typeDescr[i])){
-                return false;
-            }
-        }
-        return true;
+        return typeDescr.every((itemDescr, i) => conforms(suspect[i], itemDescr));
     }
     if (typeDescr instanceof Set){
         for (const possibleTypeDescr of typeDescr){
