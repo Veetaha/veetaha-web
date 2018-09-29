@@ -92,6 +92,7 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
     }
 
     async getById(targetId: number) {
+        this.goodIdOrThrow(targetId);
         const entityArr = await this.getAll();
         return entityArr[this.tryFindEntityIndexById(entityArr, targetId)];
     }
@@ -100,27 +101,45 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
     }
 
     async update(newValue: Readonly<T>) {
+        this.goodIdOrThrow(newValue.id);
         const entityArr = await this.getAll() as Readonly<T>[];
         entityArr[this.tryFindEntityIndexById(entityArr, newValue.id)] = newValue;
         await this.writeChangesToFile(entityArr);
     }
 
+    /**
+     * Deletes entity from storage by given id. Thorws Error, if no such entity was found.
+     * @param id
+     */
     async delete(id: number) {
+        this.goodIdOrThrow(id);
         const entityArr = await this.getAll();
         entityArr.splice(this.tryFindEntityIndexById(entityArr, id), 1);
         await this.writeChangesToFile(entityArr);
     }
 
+    /**
+     *  Insterts newValue to the storage and assigns newValue.id to its id in storage.
+     *  Returns assigned id.
+     * @param newValue Value to insert into storage, newValue.id property is preliminary assigned
+     *                 a new value before insertion. Returns assigned newValue.id.
+     */
     async insert(newValue: T) {
         newValue.id     = this.nextId++;
         const entityArr = (await this.getAll());
         entityArr.push(newValue);
         await this.writeChangesToFile(entityArr);
+        return newValue.id;
     }
 
 
 
 // DETAILS------------------------------------------------------------------------------------
+    private goodIdOrThrow(suspect: number){
+        if (suspect <= 0) {
+            throw new Error(`invalid id: ${suspect}`);
+        }
+    }
     private async readJsonStorage() {
         return JsonFileStorage.readFromJsonFile<JsonJsonFileStorage<T>,
                                                 JsonJsonFileStorage<TJsonRepr>>(
