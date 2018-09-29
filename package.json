@@ -1,9 +1,10 @@
 {
   "name": "veetaha-web",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "General purpose typescript NodeJS library.",
   "main": "build/veetaha.js",
   "types": "build/veetaha.d.ts",
+  "repository": "https://github.com/Veetaha/veetaha-web",
   "scripts": {
     "test": "mocha build/test"
   },

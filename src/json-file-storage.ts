@@ -36,9 +36,9 @@ export class JsonFileStorage<T extends Types.Identifiable> {
         );
     }
 
-    nextId = 1;
-    filePath: string;
-    readonly storageTD: Types.TypeDescription;
+    private nextId = 1;
+    private readonly filePath: string;
+    private readonly storageTD: Types.TypeDescription;
 
     /**
      * Creates new instance of JsonFileStorage, but doesn't initialize the file at physical disk.
@@ -80,10 +80,8 @@ export class JsonFileStorage<T extends Types.Identifiable> {
     }
 
     async getById(targetId: number) {
-        const target = (await this.getAll()).find(item => item.id === targetId);
-        if (target) {
-            return target;
-        } else throw this.noEntityWasFoundError(targetId);
+        const entityArr = await this.getAll();
+        return entityArr[this.tryFindEntityIndexById(entityArr, targetId)];
     }
     async getAll() {
         return (await JsonFileStorage.readFromJsonFile<JsonFileStorageTD<T>>(
@@ -93,21 +91,13 @@ export class JsonFileStorage<T extends Types.Identifiable> {
 
     async update(newValue: Readonly<T>) {
         const entityArr = await this.getAll() as Readonly<T>[];
-        const targetIndex = entityArr.findIndex(item => item.id === newValue.id);
-        if (targetIndex < 0) {
-            throw this.noEntityWasFoundError(newValue.id);
-        }
-        entityArr[targetIndex] = newValue;
+        entityArr[this.tryFindEntityIndexById(entityArr, newValue.id)] = newValue;
         await this.writeChangesToFile(entityArr);
     }
 
     async delete(id: number) {
         const entityArr = await this.getAll();
-        const rubishIndex = entityArr.findIndex(item => item.id === id);
-        if (rubishIndex < 0) {
-            throw this.noEntityWasFoundError(id);
-        }
-        entityArr.splice(rubishIndex, 1);
+        entityArr.splice(this.tryFindEntityIndexById(entityArr, id), 1);
         await this.writeChangesToFile(entityArr);
     }
 
@@ -118,8 +108,18 @@ export class JsonFileStorage<T extends Types.Identifiable> {
         await this.writeChangesToFile(entityArr);
     }
 
+    private tryFindEntityIndexById(entityArr: T[], id: number) {
+        const targetIndex = entityArr.findIndex(entity => entity.id === id);
+        if (targetIndex < 0) {
+            throw this.noEntityWasFoundError(id);
+        }
+        return targetIndex;
+    }
+
     private noEntityWasFoundError(targetId: number) {
-        return new Error(`no entity under id ${targetId} was found in "${this.filePath}"`);
+        return new Error(`no entity under id ${targetId} was found in "${
+            this.filePath
+        }"`);
     }
 
     private async writeChangesToFile(changedValues: T[]) {
