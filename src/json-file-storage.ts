@@ -12,7 +12,8 @@ type JsonReviver<T, TJsonRepr> = (jsonValue: TJsonRepr) => T;
  *                    stored in a JSON file.
  * @param TJsonRepr   JSON type representation of T.
  */
-export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Types.Identifiable> {
+export class JsonFileStorage<T         extends Types.Identifiable,
+                             TJsonRepr extends Types.Identifiable> {
     private             nextId = 1;
     public  reviveJsonEntity: JsonReviver<T, TJsonRepr>;
     private readonly  filePath: string;
@@ -45,21 +46,11 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
             return jsonReviver(jsonObj);
         }
         throw new Error(
-            `Actual json data doesn't conform to the required type: ${ jsonString }`
+            `actual json data doesn't conform to the required type: ${ jsonString }`
         );
     }
 
-
-    /**
-     * Creates new instance of JsonFileStorage, but doesn't initialize the file at physical disk.
-     * @param itemsTD     Type description the resulting JSON value must conform to. (takes ownership)
-     * @param filePath    String with the JSON target file path.
-     * @param jsonReviver Function invoked to revive stored objects when using JSON.parse()
-     * @throws Error If actual JSON value doesn't conform to the given TD,
-     *               if failed to read required file,
-     *               if failed to parse resulting JSON string.
-     */
-    constructor(
+    private constructor(
         itemsTD:     Types.TypeDescription,
         filePath:    string,
         jsonReviver: JsonReviver<T, TJsonRepr>
@@ -74,25 +65,38 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
 
     /**
      * Creates a new file for this Storage or reads the content of an existing file to initialize
-     * its internal data (e.g. next id number).
-     * @throws Error If failed to write to the required file.
+     * its internal data (e.g. next id number) and returns an instance of JsonFileStorage.
+     * @param itemsTD     Type description the resulting JSON value must conform to.
+     *                    (takes ownership)
+     * @param filePath    String with the JSON target file path.
+     * @param jsonReviver Function invoked to revive stored objects when using JSON.parse()
+     * @throws Error      If failed to write to the required file.
+     *
      * If failed to read or parse required JSON file, creates new file, or rewrites existing one.
      * If JSON file doesn't exist, it creates a new one.
      *
      */
-    async initialize() {
+    static async initStorage<T         extends Types.Identifiable,
+                             TJsonRepr extends Types.Identifiable>
+    (
+        itemsTD:     Types.TypeDescription,
+        filePath:    string,
+        jsonReviver: JsonReviver<T, TJsonRepr>
+    ) {
+        const newbie = new JsonFileStorage(itemsTD, filePath, jsonReviver);
         try {
-            this.nextId = (await this.readJsonStorage()).nextId;
+            newbie.nextId = (await newbie.readJsonStorage()).nextId;
         } catch (_error) {
-            await Fsextra.writeJSON(this.filePath, {
-                nextId: (this.nextId = 1),
+            await Fsextra.writeJSON(newbie.filePath, {
+                nextId: (newbie.nextId = 1),
                 items: []
             });
         }
+        return newbie;
     }
 
     async getById(targetId: number) {
-        this.goodIdOrThrow(targetId);
+        JsonFileStorage.goodIdOrThrow(targetId);
         const entityArr = await this.getAll();
         return entityArr[this.tryFindEntityIndexById(entityArr, targetId)];
     }
@@ -101,7 +105,7 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
     }
 
     async update(newValue: Readonly<T>) {
-        this.goodIdOrThrow(newValue.id);
+        JsonFileStorage.goodIdOrThrow(newValue.id);
         const entityArr = await this.getAll() as Readonly<T>[];
         entityArr[this.tryFindEntityIndexById(entityArr, newValue.id)] = newValue;
         await this.writeChangesToFile(entityArr);
@@ -112,7 +116,7 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
      * @param id
      */
     async delete(id: number) {
-        this.goodIdOrThrow(id);
+        JsonFileStorage.goodIdOrThrow(id);
         const entityArr = await this.getAll();
         entityArr.splice(this.tryFindEntityIndexById(entityArr, id), 1);
         await this.writeChangesToFile(entityArr);
@@ -135,7 +139,7 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
 
 
 // DETAILS------------------------------------------------------------------------------------
-    private goodIdOrThrow(suspect: number){
+    private static goodIdOrThrow(suspect: number){
         if (suspect <= 0) {
             throw new Error(`invalid id: ${suspect}`);
         }
