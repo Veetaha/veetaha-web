@@ -45,7 +45,7 @@ export class JsonFileStorage<T extends Types.Identifiable, TJsonRepr extends Typ
             return jsonReviver(jsonObj);
         }
         throw new Error(
-            `Actual json data doesn't conform to the required type: ${jsonObj}`
+            `Actual json data doesn't conform to the required type: ${ jsonString }`
         );
     }
 

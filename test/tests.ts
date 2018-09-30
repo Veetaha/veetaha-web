@@ -99,6 +99,5 @@ describe('Types.conforms', () => {
             avaUrl: 'string',
             isDisabled: 'boolean',
         }));
-
     });
 });

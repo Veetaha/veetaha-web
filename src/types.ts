@@ -6,8 +6,8 @@ export interface BasicObject<TValue = unknown> {
 export interface BasicFunctor<
     TArgs extends any[]  = unknown[],
     TRetval              = unknown,
-    T                    = unknown
-    > extends BasicObject<T> {
+    TProps               = unknown
+    > extends BasicObject<TProps> {
     (...args: TArgs): TRetval;
 }
 export type BasicType = number    | string      | boolean  |
