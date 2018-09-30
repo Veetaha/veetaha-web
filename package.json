@@ -1,6 +1,6 @@
 {
     "name": "veetaha-web",
-    "version": "1.0.20",
+    "version": "1.0.22",
     "description": "General purpose typescript NodeJS library.",
     "main": "build/veetaha.js",
     "types": "build/veetaha.d.ts",
