@@ -1,6 +1,6 @@
 {
     "name": "veetaha-web",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "description": "General purpose typescript NodeJS library.",
     "main": "build/veetaha.js",
     "types": "build/veetaha.d.ts",
@@ -18,7 +18,8 @@
         "fs-extra": "*",
         "mocha": "*",
         "chai": "*",
-        "ts-node": "*"
+        "ts-node": "*",
+        "is-iso-date": "*"
     },
     "devDependencies": {
         "@types/chai": "*",

@@ -1,3 +1,4 @@
+import isISODate = require('is-iso-date');
 export type int  = number;
 export type char = string;
 export interface BasicObject<TValue = unknown> {
@@ -122,3 +123,27 @@ export interface Identifiable {
 }
 
 
+
+export namespace TypeChecks {
+    export function isInteger(suspect: unknown): suspect is number {
+        return typeof suspect === 'number' && Number.isInteger(suspect);
+    }
+    export function isPositiveInteger(suspect: unknown): suspect is number {
+        return isInteger(suspect) && suspect > 0;
+    }
+    export function isPositiveNumber(suspect: unknown): suspect is number {
+        return typeof suspect === 'number' && suspect > 0;
+    }
+    export function isZeroOrPositiveInteger(suspect: unknown): suspect is number {
+        return isPositiveInteger(suspect) || suspect === 0;
+    }
+    export function isZeroOrPositiveNumber(suspect: unknown): suspect is number {
+        return isPositiveNumber(suspect) || suspect === 0;
+    }
+    export function isOneOf<T>(possibleValues: T[]){
+        return (suspect: any): suspect is T => possibleValues.includes(suspect);
+    }
+    export function isIsoDateString(suspect: unknown): suspect is string {
+        return typeof suspect === 'string' && isISODate(suspect);
+    }
+}
