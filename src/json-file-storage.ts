@@ -177,6 +177,5 @@ export class JsonFileStorage<T         extends Types.Identifiable,
                 spaces: 4
             });
     }
-
 }
 
