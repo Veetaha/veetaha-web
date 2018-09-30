@@ -87,10 +87,8 @@ export class JsonFileStorage<T         extends Types.Identifiable,
         try {
             newbie.nextId = (await newbie.readJsonStorage()).nextId;
         } catch (_error) {
-            await Fsextra.writeJSON(newbie.filePath, {
-                nextId: (newbie.nextId = 1),
-                items: []
-            });
+            newbie.nextId = 1;
+            newbie.writeChangesToFile([]);
         }
         return newbie;
     }
