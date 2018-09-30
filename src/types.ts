@@ -146,4 +146,12 @@ export namespace TypeChecks {
     export function isIsoDateString(suspect: unknown): suspect is string {
         return typeof suspect === 'string' && isISODate(suspect);
     }
+    export function isNumberWithinRange(min: number, max: number){
+        return (suspect: unknown): suspect is number => typeof suspect === 'number' &&
+            (min > max ? (max <= suspect && suspect <= min) : (min <= suspect && suspect <= max));
+    }
+    export function isIntegerWithinRange(min: number, max: number){
+        return (suspect: unknown): suspect is number => isInteger(suspect) &&
+            (min > max ? (max <= suspect && suspect <= min) : (min <= suspect && suspect <= max));
+    }
 }
