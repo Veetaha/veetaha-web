@@ -25,7 +25,7 @@
     "moduleResolution": "node"
 //    "skipLibCheck": true
   },
-  "files": ["veetaha.ts"],
+  "files": ["veetaha.ts", "./dev/publish.ts"],
   "include": [
     "./**/*"
   ],
