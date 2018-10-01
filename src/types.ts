@@ -22,6 +22,13 @@ export function isBasicObject(suspect: unknown) : suspect is BasicObject<unknown
     );
 }
 
+export function reinterpret_cast<T>(target: any): T{
+    return target;
+}
+export function assert_type<T>(_target: any): _target is T {
+    return true;
+}
+
 
 export function isBasicTypeName(suspect: string): suspect is BasicTypeName {
     switch (suspect) {
