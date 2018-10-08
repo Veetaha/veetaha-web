@@ -1,6 +1,4 @@
 import isISODate = require('is-iso-date');
-export type int  = number;
-export type char = string;
 export interface BasicObject<TValue = unknown> {
     [key: string]: TValue;
 }
@@ -44,7 +42,7 @@ export interface TypeDescrArray  extends Array<TypeDescription>
 {}
 export interface TypeDescrSet    extends Set<TypeDescription>
 {}
-export type TypePredicate = (suspect: unknown) => boolean;
+export type TypePredicate   = (suspect: unknown) => boolean;
 export type TypeDescription = TypeDescrObjMap | TypeDescrArray | TypePredicate |
                                  TypeDescrSet | BasicTypeName;
 
@@ -112,12 +110,9 @@ export function conforms<T = unknown>(suspect: unknown, typeDescr: TypeDescripti
     if (!isBasicObject(suspect) || Array.isArray(suspect)) {
         return false;
     }
-    for (const propName of Object.getOwnPropertyNames(typeDescr)){
-        if (!conforms(suspect[propName], typeDescr[propName])) {
-            return false;
-        }
-    }
-    return true;
+    return Object.getOwnPropertyNames(typeDescr).every(propName => conforms(
+        suspect[propName], typeDescr[propName]
+    ));
 }
 
 

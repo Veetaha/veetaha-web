@@ -1,6 +1,6 @@
 {
     "name": "veetaha-web",
-    "version": "1.0.29",
+    "version": "1.0.30",
     "description": "General purpose typescript NodeJS library.",
     "main": "build/veetaha.js",
     "types": "build/veetaha.d.ts",
@@ -15,21 +15,21 @@
     "author": "Vitaliy Kryvenko",
     "license": "MIT",
     "dependencies": {
-        "fs-extra": "*",
-        "mocha": "*",
-        "chai": "*",
-        "ts-node": "*",
-        "is-iso-date": "*"
+        "fs-extra": "latest",
+        "mocha": "latest",
+        "chai": "latest",
+        "ts-node": "latest",
+        "is-iso-date": "latest"
     },
     "devDependencies": {
-        "@types/chai": "*",
-        "@types/fs-extra": "*",
-        "@types/mocha": "*",
-        "@types/node": "*",
-        "typescript": "^3.0.3",
-        "shelljs": "*",
-        "@types/shelljs": "*",
-        "readline-sync": "*",
-        "@types/readline-sync": "*"
+        "@types/chai": "latest",
+        "@types/fs-extra": "latest",
+        "@types/mocha": "latest",
+        "@types/node": "latest",
+        "@types/shelljs": "latest",
+        "@types/readline-sync": "latest",
+        "typescript": "latest",
+        "shelljs": "latest",
+        "readline-sync": "latest"
     }
 }
