@@ -84,7 +84,14 @@ export class JsonFileStorage<T         extends Types.Identifiable,
         jsonReviver: JsonReviver<T, TJsonRepr>
     ) {
         const newbie = new JsonFileStorage(itemsTD, filePath, jsonReviver);
-        newbie.nextId = (await newbie.readJsonStorage()).nextId;
+        try {
+            newbie.nextId = (await newbie.readJsonStorage()).nextId;
+        } catch (error) {
+            if (error.code === 'ENOENT'){
+                newbie.nextId = 1;
+                newbie.writeChangesToFile([]);
+            }
+        }
         return newbie;
     }
 
